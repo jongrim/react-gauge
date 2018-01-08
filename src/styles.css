@@ -1,0 +1,17 @@
+.fa {
+  font-size: 3rem;
+}
+
+.gaugeIcon {
+  position: absolute;
+  right: 35%;
+  bottom: 35%;
+  color: #ccc;
+}
+
+.gaugeContainer {
+  display: inline-block;
+  position: relative;
+  height: 10rem;
+  width: 10rem;
+}
