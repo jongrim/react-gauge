@@ -1,6 +1,56 @@
 import React from 'react';
 import './styles.css';
 
+const RADIUS = 100;
+const SIZE = 240;
+const START_POINT = {
+  X: 115,
+  Y: 115
+};
+const SEGMENTS = [
+  // this should ideally be computed based on the SIZE, but hardcoded for now
+  {
+    start: -120,
+    end: -100
+  },
+  {
+    start: -96,
+    end: -76
+  },
+  {
+    start: -72,
+    end: -52
+  },
+  {
+    start: -48,
+    end: -28
+  },
+  {
+    start: -24,
+    end: -2
+  },
+  {
+    start: 2,
+    end: 24
+  },
+  {
+    start: 28,
+    end: 48
+  },
+  {
+    start: 52,
+    end: 72
+  },
+  {
+    start: 76,
+    end: 96
+  },
+  {
+    start: 100,
+    end: 120
+  }
+];
+
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
   var angleInRadians = (angleInDegrees - 90) * Math.PI / 180;
 
@@ -33,20 +83,14 @@ function describeArc(x, y, radius, startAngle, endAngle) {
   return d;
 }
 
-function translateScoreToAngle(score, size) {
-  const angPerPoint = size / 100;
-  let startAngle = score * angPerPoint - size / 2;
-  startAngle = startAngle < size / 2 - 30 ? startAngle : size / 2 - 30;
-  return startAngle;
-}
+const ReactGauge = ({ icon, scores }) => {
+  const strokeWidth = 10;
+  const strokeColor = 'LightGray';
 
-const ReactGauge = ({ baseTrackSettings, icon, segments }) => {
-  const {
-    size,
-    strokeWidth = 10,
-    strokeColor = 'LightGray'
-  } = baseTrackSettings;
   const boxSize = 200 + 30 + strokeWidth * 2;
+
+  const base = scores.map(score => Math.floor(score / 10) - 1);
+  console.log(base);
   return (
     <div className="gaugeContainer">
       <svg
@@ -58,23 +102,20 @@ const ReactGauge = ({ baseTrackSettings, icon, segments }) => {
         strokeWidth={`${strokeWidth}px`}
         viewBox={`0 0 ${boxSize} ${boxSize}`}
         xmlns="http://www.w3.org/2000/svg">
-        <path
-          fill="none"
-          stroke="LightGray"
-          strokeLinecap="round"
-          d={describeArc(115, 115, 100, -(size / 2), size / 2)}
-        />
-        {segments.map(({ score, ...other }, i) => {
-          const startAngle = translateScoreToAngle(score, size);
-          const endAngle = startAngle + 30;
-
-          console.log(startAngle, endAngle);
+        {SEGMENTS.map((seg, i) => {
+          const highlight = base.indexOf(i) >= 0;
           return (
             <path
-              key={`seg-${i}`}
               fill="none"
-              {...other}
-              d={describeArc(115, 115, 100, startAngle, endAngle)}
+              key={`seg-${i}`}
+              stroke={highlight ? 'red' : 'LightGray'}
+              d={describeArc(
+                START_POINT.X,
+                START_POINT.Y,
+                RADIUS,
+                seg.start,
+                seg.end
+              )}
             />
           );
         })}
