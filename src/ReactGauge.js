@@ -3,53 +3,27 @@ import './styles.css';
 
 const RADIUS = 100;
 const SIZE = 240;
+const SEGMENT_COUNT = 10;
+const SEGMENT_SIZE = 23;
 const START_POINT = {
   X: 115,
   Y: 115
 };
-const SEGMENTS = [
-  // this should ideally be computed based on the SIZE, but hardcoded for now
-  {
-    start: -120,
-    end: -100
-  },
-  {
-    start: -96,
-    end: -76
-  },
-  {
-    start: -72,
-    end: -52
-  },
-  {
-    start: -48,
-    end: -28
-  },
-  {
-    start: -24,
-    end: -2
-  },
-  {
-    start: 2,
-    end: 24
-  },
-  {
-    start: 28,
-    end: 48
-  },
-  {
-    start: 52,
-    end: 72
-  },
-  {
-    start: 76,
-    end: 96
-  },
-  {
-    start: 100,
-    end: 120
+
+function makeSegments(size, segmentCount, segmentSize) {
+  let startPoint = - (size / 2);
+  const arcSpace = segmentCount * segmentSize;
+  const emptySpace = size - arcSpace;
+  const emptySegSize = emptySpace / (segmentCount - 1);
+
+  const segments = [];
+  for (let i = 0; i < segmentCount; i++) {
+    segments.push({ start: startPoint, end: startPoint + segmentSize });
+    startPoint = startPoint + segmentSize + emptySegSize;
   }
-];
+
+  return segments;
+}
 
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
   var angleInRadians = (angleInDegrees - 90) * Math.PI / 180;
@@ -83,16 +57,15 @@ function describeArc(x, y, radius, startAngle, endAngle) {
   return d;
 }
 
-const ReactGauge = ({ icon, scores }) => {
+const ReactGauge = ({ icon, label, scores }) => {
   const strokeWidth = 10;
   const strokeColor = 'LightGray';
-
-  const boxSize = 200 + 30 + strokeWidth * 2;
-
   const base = scores.map(score => Math.floor(score / 10) - 1);
-  console.log(base);
+
+  const segments = makeSegments(SIZE, SEGMENT_COUNT, SEGMENT_SIZE);
+
   return (
-    <div className="gaugeContainer">
+    <div className="gauge-container">
       <svg
         className="gauge"
         fill="none"
@@ -100,9 +73,9 @@ const ReactGauge = ({ icon, scores }) => {
         width="100%"
         stroke={strokeColor}
         strokeWidth={`${strokeWidth}px`}
-        viewBox={`0 0 ${boxSize} ${boxSize}`}
+        viewBox="0 0 240 240"
         xmlns="http://www.w3.org/2000/svg">
-        {SEGMENTS.map((seg, i) => {
+        {segments.map((seg, i) => {
           const highlight = base.indexOf(i) >= 0;
           return (
             <path
@@ -120,7 +93,12 @@ const ReactGauge = ({ icon, scores }) => {
           );
         })}
       </svg>
-      {icon && <i className={`${icon} gaugeIcon`} />}
+      {icon && (
+        <div className="gauge-icon">
+          <i className={`${icon}`} />
+          <p>{label}</p>
+        </div>
+      )}
     </div>
   );
 };

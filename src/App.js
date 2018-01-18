@@ -5,7 +5,7 @@ import './App.css';
 const App = () => {
   return (
     <div className="App">
-      <ReactGauge icon="fa fa-user" scores={[33, 76]} />
+      <ReactGauge icon="fa fa-user" label="Voice" scores={[33, 76]} />
     </div>
   );
 };
